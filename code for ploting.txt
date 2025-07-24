@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv('train.csv')
+df.head()
+df.isnull().sum()
+# Fill Age with median
+df['Age'].fillna(df['Age'].median(), inplace=True)
+
+# Fill Embarked with mode
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+# Drop Cabin column (too many missing)
+df.drop(columns='Cabin', inplace=True)
+df['Sex'] = df['Sex'].astype('category')
+df['Embarked'] = df['Embarked'].astype('category')
+sns.countplot(x='Survived', data=df)
+plt.title('Survival Count')
+plt.show()
+print(df['Survived'].value_counts(normalize=True))
+sns.countplot(x='Survived', hue='Sex', data=df)
+plt.title('Survival by Sex')
+plt.show()
+sns.countplot(x='Survived', hue='Pclass', data=df)
+plt.title('Survival by Passenger Class')
+plt.show()
+plt.figure(figsize=(10, 6))
+sns.histplot(df['Age'], bins=30, kde=True)
+plt.title('Age Distribution')
+plt.show()
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='Survived', y='Age', data=df)
+plt.title('Age vs Survival')
+plt.show()
+plt.figure(figsize=(10, 8))
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm')
+plt.title('Correlation Matrix')
+plt.show()
+df['Title'] = df['Name'].str.extract(' ([A-Za-z]+)\.', expand=False)
+df['Title'] = df['Title'].replace(['Mlle', 'Ms', 'Lady', 'Dona'], 'Miss')
+df['Title'] = df['Title'].replace(['Mme', 'Countess'], 'Mrs')
+df['Title'] = df['Title'].replace(['Capt', 'Col', 'Major', 'Dr', 'Rev', 'Jonkheer', 'Sir', 'Don'], 'Rare')
+
+sns.countplot(x='Title', hue='Survived', data=df)
+plt.xticks(rotation=45)
+plt.title('Survival by Title')
+plt.show()
+
